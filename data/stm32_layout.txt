@@ -1,0 +1,24 @@
+struct M10_GNSS {
+	available_satelites_table  num_available_satelites; /*     0     6 */
+
+	/* XXX 2 bytes hole, try to pack */
+
+	gnss_lat_long_measurement  latitude;             /*     8    16 */
+	gnss_lat_long_measurement  longitude;            /*    24    16 */
+	gnss_numeric_measurement   course_over_ground;   /*    40    24 */
+	/* --- cacheline 1 boundary (64 bytes) --- */
+	gnss_numeric_measurement   speed_over_ground_knots; /*    64    24 */
+	utc_date_time              time_of_sample;       /*    88    16 */
+	char                       buffer_empty;         /*   104     1 */
+
+	/* XXX 3 bytes hole, try to pack */
+
+	I2C_HandleTypeDef *        i2c_handle;           /*   108     4 */
+	int                        i2c_address;          /*   112     4 */
+
+	/* size: 120, cachelines: 2, members: 9 */
+	/* sum members: 111, holes: 2, sum holes: 5 */
+	/* padding: 4 */
+	/* last cacheline: 56 bytes */
+};
+
