@@ -1,0 +1,2 @@
+gp,gl,ga,gb,gi,gq,Latitude: Available,Latitude: Degrees,Latitude: Minutes,Latitude: Indicator,Longitude: Available,Longitude: Degrees,Longitude: Minutes,Longitude: Indicator,Course Over Ground: Available,Course Over Ground: Value,Course Over Ground: Unit Of Measurement,Speed Over Ground: Available,Speed Over Ground: Value,Speed Over Ground: Unit Of Measurement,Timestamp: Year,Timestamp: Month,Timestamp: Day,Timestamp: Hour,Timestamp: Minute,Timestamp: Second,Timestamp: Available
+8,1,2,0,3,0,false,0,0.1,S,false,0,0.1,W,false,0.1,m,false,0.2,k,25,1,13,11,0,20,false

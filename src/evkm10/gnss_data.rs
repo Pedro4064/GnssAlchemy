@@ -1,13 +1,14 @@
-use std::convert::Into;
+use std::{convert::Into, fmt};
+use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct GnssAvailableSatellites {
-    gp: u8,
-    gl: u8,
-    ga: u8,
-    gb: u8,
-    gi: u8,
-    gq: u8,
+    pub gp: u8,
+    pub gl: u8,
+    pub ga: u8,
+    pub gb: u8,
+    pub gi: u8,
+    pub gq: u8,
 }
 
 impl GnssAvailableSatellites {
@@ -23,11 +24,11 @@ impl GnssAvailableSatellites {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct GnssNumericMeasurement {
-    is_available: bool,
-    value: f64,
-    unit_of_measurement: char,
+    pub is_available: bool,
+    pub value: f64,
+    pub unit_of_measurement: char,
 }
 
 impl GnssNumericMeasurement {
@@ -40,7 +41,8 @@ impl GnssNumericMeasurement {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(tag = "type")]
 pub enum GnssLatLongIndicator {
     N,
     S,
@@ -60,12 +62,24 @@ impl Into<GnssLatLongIndicator> for u8 {
     }
 }
 
-#[derive(Debug)]
+impl fmt::Display for GnssLatLongIndicator {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            match self {
+                GnssLatLongIndicator::N => write!(f, "N"),
+                GnssLatLongIndicator::S => write!(f, "S"),
+                GnssLatLongIndicator::E => write!(f, "E"),
+                GnssLatLongIndicator::W => write!(f, "W"),
+            }
+        }
+    
+}
+
+#[derive(Debug, Serialize)]
 pub struct GnssLatLongMeasurement {
-    is_available: bool,
-    degrees: i32,
-    minutes: f32,
-    indicator: GnssLatLongIndicator,
+    pub is_available: bool,
+    pub degrees: i32,
+    pub minutes: f32,
+    pub indicator: GnssLatLongIndicator,
 }
 
 impl GnssLatLongMeasurement {
@@ -82,15 +96,15 @@ impl GnssLatLongMeasurement {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct UtcDateTime {
-    year: u8,
-    month: u8,
-    day: u8,
-    hour: u8,
-    minute: u8,
-    second: f32,
-    is_available: bool,
+    pub year: u8,
+    pub month: u8,
+    pub day: u8,
+    pub hour: u8,
+    pub minute: u8,
+    pub second: f32,
+    pub is_available: bool,
 }
 
 impl UtcDateTime {

@@ -1,16 +1,28 @@
 use crate::evkm10::gnss_data::{
     GnssAvailableSatellites, GnssLatLongMeasurement, GnssNumericMeasurement, UtcDateTime,
 };
+use serde::Serialize;
 
 pub mod gnss_data;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct M10GnssDataPoint {
+    #[serde(flatten)]
     available_satellites: GnssAvailableSatellites,
-    latitute: GnssLatLongMeasurement,
+
+    #[serde(flatten)]
+    latitude: GnssLatLongMeasurement,
+
+    #[serde(flatten)]
     longitude: GnssLatLongMeasurement,
+
+    #[serde(flatten)]
     course_over_ground: GnssNumericMeasurement,
+
+    #[serde(flatten)]
     speed_over_ground: GnssNumericMeasurement,
+
+    #[serde(flatten)]
     time_of_sample: UtcDateTime,
 }
 
@@ -28,7 +40,7 @@ impl M10GnssDataPoint {
                     .expect("Unable to parse bytes from available satellites"),
             ),
             // Skip 2 Padding Bytes
-            latitute: GnssLatLongMeasurement::from_bytes(
+            latitude: GnssLatLongMeasurement::from_bytes(
                 bytes[8..8 + 16]
                     .try_into()
                     .expect("Unable to parse bytes from latitude"),
@@ -54,6 +66,38 @@ impl M10GnssDataPoint {
                     .expect("Unable to parse bytes for time of sample"),
             ),
         }
+    }
+
+    pub fn serialize_to_string_vec(&self) -> Vec<String> {
+        vec![
+            self.available_satellites.gp.to_string(),
+            self.available_satellites.gl.to_string(),
+            self.available_satellites.ga.to_string(),
+            self.available_satellites.gb.to_string(),
+            self.available_satellites.gi.to_string(),
+            self.available_satellites.gq.to_string(),
+            self.latitude.is_available.to_string(),
+            self.latitude.degrees.to_string(),
+            self.latitude.minutes.to_string(),
+            self.latitude.indicator.to_string(),
+            self.longitude.is_available.to_string(),
+            self.longitude.degrees.to_string(),
+            self.longitude.minutes.to_string(),
+            self.longitude.indicator.to_string(),
+            self.course_over_ground.is_available.to_string(),
+            self.course_over_ground.value.to_string(),
+            self.course_over_ground.unit_of_measurement.to_string(),
+            self.speed_over_ground.is_available.to_string(),
+            self.speed_over_ground.value.to_string(),
+            self.speed_over_ground.unit_of_measurement.to_string(),
+            self.time_of_sample.year.to_string(),
+            self.time_of_sample.month.to_string(),
+            self.time_of_sample.day.to_string(),
+            self.time_of_sample.hour.to_string(),
+            self.time_of_sample.minute.to_string(),
+            self.time_of_sample.second.to_string(),
+            self.time_of_sample.is_available.to_string(),
+        ]
     }
 }
 
