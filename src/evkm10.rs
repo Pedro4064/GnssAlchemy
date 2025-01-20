@@ -1,38 +1,24 @@
 use crate::evkm10::gnss_data::{
     GnssAvailableSatellites, GnssLatLongMeasurement, GnssNumericMeasurement, UtcDateTime,
 };
+use csv::WriterBuilder;
 use serde::Serialize;
+use std::{fs::File, io::Read};
 
 pub mod gnss_data;
 
 #[derive(Debug, Serialize)]
 pub struct M10GnssDataPoint {
-    #[serde(flatten)]
     available_satellites: GnssAvailableSatellites,
-
-    #[serde(flatten)]
     latitude: GnssLatLongMeasurement,
-
-    #[serde(flatten)]
     longitude: GnssLatLongMeasurement,
-
-    #[serde(flatten)]
     course_over_ground: GnssNumericMeasurement,
-
-    #[serde(flatten)]
     speed_over_ground: GnssNumericMeasurement,
-
-    #[serde(flatten)]
     time_of_sample: UtcDateTime,
 }
 
-pub struct M10GnssDataSet {
-    data_points: Vec<M10GnssDataPoint>,
-    bytes_per_element: u128,
-}
-
 impl M10GnssDataPoint {
-    pub fn from_bytes(bytes: &[u8; 120]) -> Self {
+    pub fn from_bytes(bytes: &[u8]) -> Self {
         M10GnssDataPoint {
             available_satellites: GnssAvailableSatellites::from_bytes(
                 bytes[..6]
@@ -101,10 +87,67 @@ impl M10GnssDataPoint {
     }
 }
 
+pub struct M10GnssDataSet {
+    data_points: Vec<M10GnssDataPoint>,
+}
+
 impl M10GnssDataSet {
-    pub fn from_bin_dump() -> Self {
-        todo!();
+    pub fn from_bin_dump(dump_file_path: &str) -> Self {
+        let mut file = File::open(dump_file_path).expect("Unable to open file");
+        let mut bin_content: Vec<u8> = Vec::new();
+
+        file.read_to_end(&mut bin_content)
+            .expect("Unable to read bin data dump");
+        M10GnssDataSet {
+            data_points: bin_content
+                .chunks(120)
+                .map(|bin_chunk| M10GnssDataPoint::from_bytes(bin_chunk))
+                .collect(),
+        }
     }
 
-    pub fn to_csv(&self) {}
+    pub fn to_csv(&self) {
+        let mut csv_writer = WriterBuilder::new()
+            .has_headers(false)
+            .from_path("potato.csv")
+            .expect("Unable to create/open csv file");
+
+        csv_writer
+            .write_record([
+                "gp",
+                "gl",
+                "ga",
+                "gb",
+                "gi",
+                "gq",
+                "Latitude: Available",
+                "Latitude: Degrees",
+                "Latitude: Minutes",
+                "Latitude: Indicator",
+                "Longitude: Available",
+                "Longitude: Degrees",
+                "Longitude: Minutes",
+                "Longitude: Indicator",
+                "Course Over Ground: Available",
+                "Course Over Ground: Value",
+                "Course Over Ground: Unit Of Measurement",
+                "Speed Over Ground: Available",
+                "Speed Over Ground: Value",
+                "Speed Over Ground: Unit Of Measurement",
+                "Timestamp: Year",
+                "Timestamp: Month",
+                "Timestamp: Day",
+                "Timestamp: Hour",
+                "Timestamp: Minute",
+                "Timestamp: Second",
+                "Timestamp: Available",
+            ])
+            .expect("Unable to Write Headers to .csv file");
+
+        for data_point in &self.data_points {
+            csv_writer
+                .write_record(data_point.serialize_to_string_vec())
+                .expect("Unable to write data point to csv file");
+        }
+    }
 }
