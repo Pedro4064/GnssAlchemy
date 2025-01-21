@@ -3,7 +3,7 @@ use crate::evkm10::gnss_data::{
 };
 use csv::WriterBuilder;
 use serde::Serialize;
-use std::{fs::File, io::Read};
+use std::{fs::File, io::Read, path::PathBuf};
 
 pub mod gnss_data;
 
@@ -92,7 +92,7 @@ pub struct M10GnssDataSet {
 }
 
 impl M10GnssDataSet {
-    pub fn from_bin_dump(dump_file_path: &str) -> Self {
+    pub fn from_bin_dump(dump_file_path: PathBuf) -> Self {
         let mut file = File::open(dump_file_path).expect("Unable to open file");
         let mut bin_content: Vec<u8> = Vec::new();
 
@@ -100,16 +100,16 @@ impl M10GnssDataSet {
             .expect("Unable to read bin data dump");
         M10GnssDataSet {
             data_points: bin_content
-                .chunks(120)
+                .chunks_exact(120)
                 .map(|bin_chunk| M10GnssDataPoint::from_bytes(bin_chunk))
                 .collect(),
         }
     }
 
-    pub fn to_csv(&self) {
+    pub fn to_csv(&self, csv_file_path: PathBuf) {
         let mut csv_writer = WriterBuilder::new()
             .has_headers(false)
-            .from_path("potato.csv")
+            .from_path(csv_file_path)
             .expect("Unable to create/open csv file");
 
         csv_writer
