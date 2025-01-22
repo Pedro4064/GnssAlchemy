@@ -12,6 +12,16 @@ pub struct GnssAvailableSatellites {
 }
 
 impl GnssAvailableSatellites {
+    /// Deserialize from raw binary data the number of available satellites for
+    /// each constellation
+    /// 
+    /// # Arguments
+    /// 
+    /// - `raw_bytes` - 6 byte array
+    /// 
+    /// # Return
+    /// 
+    /// An instance of `GnssAvailableSatellites`
     pub fn from_bytes(raw_bytes: [u8; 6]) -> Self {
         GnssAvailableSatellites {
             gp: raw_bytes[0],
@@ -32,6 +42,15 @@ pub struct GnssNumericMeasurement {
 }
 
 impl GnssNumericMeasurement {
+    /// Deserialize from raw binary data gnss data.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `raw_bytes` - 24 byte array
+    /// 
+    /// # Return
+    /// 
+    /// An instance of `GnssNumericMeasurement`
     pub fn from_bytes(raw_bytes: [u8; 24]) -> Self {
         GnssNumericMeasurement {
             is_available: raw_bytes[0] != 0,
@@ -83,6 +102,15 @@ pub struct GnssLatLongMeasurement {
 }
 
 impl GnssLatLongMeasurement {
+    /// Deserialize from raw binary data gnss latitude and longitude data.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `raw_bytes` - 16 byte array
+    /// 
+    /// # Return
+    /// 
+    /// An instance of `GnssLatLongMeasurement`
     pub fn from_bytes(raw_bytes: [u8; 16]) -> Self {
         GnssLatLongMeasurement {
             is_available: raw_bytes[0] != 0,
@@ -108,6 +136,16 @@ pub struct UtcDateTime {
 }
 
 impl UtcDateTime {
+    /// Deserialize from raw binary data UTC data-time data.
+    /// 
+    /// # Arguments
+    /// 
+    /// - `raw_bytes` - 16 byte array
+    /// 
+    /// # Return
+    /// 
+    /// An instance of `UtcDateTime`
+
     pub fn from_bytes(raw_bytes: [u8; 16]) -> Self {
         UtcDateTime {
             year: raw_bytes[0],

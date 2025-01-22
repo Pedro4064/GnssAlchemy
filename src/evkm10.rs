@@ -18,6 +18,15 @@ pub struct M10GnssDataPoint {
 }
 
 impl M10GnssDataPoint {
+    /// Deserialize gnss data-point from binary data.
+    ///
+    /// # Arguments
+    ///
+    /// - `bytes` - Reference to a slice of type u8 (byte)
+    ///
+    /// # Returns
+    ///
+    /// Instance of `M10GnssDataPoint` from binary file.
     pub fn from_bytes(bytes: &[u8]) -> Self {
         M10GnssDataPoint {
             available_satellites: GnssAvailableSatellites::from_bytes(
@@ -54,6 +63,12 @@ impl M10GnssDataPoint {
         }
     }
 
+    /// Converts every field in the struct into a vec of their corresponding strings version,
+    /// as to use the csv crate to write the record to file.
+    ///
+    /// # Returns
+    ///
+    /// Vector containing the string version of all struct fields.
     pub fn serialize_to_string_vec(&self) -> Vec<String> {
         vec![
             self.available_satellites.gp.to_string(),
@@ -92,6 +107,17 @@ pub struct M10GnssDataSet {
 }
 
 impl M10GnssDataSet {
+    /// Deserialize data-points from binary file
+    ///
+    /// # Arguments
+    ///
+    /// - `dump_file_path` - Path to .gnss binary file
+    ///
+    /// # Returns
+    ///
+    /// An instance of `M10GnssDataSet`, containing all data points parsed.
+    /// If the last datapoint was not entirely saved to file, it will ignore the
+    /// last impartial datapoint.
     pub fn from_bin_dump(dump_file_path: PathBuf) -> Self {
         let mut file = File::open(dump_file_path).expect("Unable to open file");
         let mut bin_content: Vec<u8> = Vec::new();
@@ -106,6 +132,11 @@ impl M10GnssDataSet {
         }
     }
 
+    /// Export data points to a csv file with the following headers:
+    ///
+    /// # Arguments
+    ///
+    /// - `csv_file_path` - Path to csv file to be written
     pub fn to_csv(&self, csv_file_path: PathBuf) {
         let mut csv_writer = WriterBuilder::new()
             .has_headers(false)
